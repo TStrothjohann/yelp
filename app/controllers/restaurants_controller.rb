@@ -1,5 +1,5 @@
 class RestaurantsController < ApplicationController
   def index
-    p 'Hello from MA'
+    @restaurants = Restaurant.all
   end
 end
