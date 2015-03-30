@@ -57,12 +57,20 @@ feature 'restaurants' do
   context 'deleting restaurants' do
 
   before {Restaurant.create name: 'KFC'}
+  before {Restaurant.find_by(name: 'KFC').reviews.create(thoughts: "Oh my god")}
 
   scenario 'removes a restaurant when a user clicks a delete link' do
     visit '/restaurants'
     click_link 'Delete KFC'
     expect(page).not_to have_content 'KFC'
     expect(page).to have_content 'Restaurant deleted successfully'
+  end
+
+  scenario 'removes all reviews when a user deletes the restaurant' do
+    visit '/restaurants'
+    click_link "Delete KFC"
+    expect(page).not_to have_content 'KFC'
+    expect(page).not_to have_content 'Oh my god'
   end
 
 end
