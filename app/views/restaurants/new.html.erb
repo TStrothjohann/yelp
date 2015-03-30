@@ -1,6 +1,7 @@
 <%= form_for Restaurant.new do |f| %>
   <%= f.label :name %>
   <%= f.text_field :name %>
+  <%= f.text_field :description %>
   <%= f.number_field :rating %>
   <%= f.submit %>
 <% end %>
