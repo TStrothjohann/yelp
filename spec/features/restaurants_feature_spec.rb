@@ -8,6 +8,7 @@ feature 'restaurants' do
       expect(page).to have_link 'Add a restaurant'
     end
   end
+  
   context 'restaurants have been added' do
     before do
       Restaurant.create(name: 'KFC')
@@ -19,16 +20,6 @@ feature 'restaurants' do
       expect(page).not_to have_content('No restaurants yet')
     end
   end
-
-  def user_login
-    visit '/restaurants'
-    click_link 'Sign up'
-    fill_in 'Email', with: "tester@test.de"
-    fill_in 'Password', with: "testtest"
-    fill_in 'Password confirmation', with: "testtest"
-    click_button 'Sign up'
-  end
-
 
   context 'creating restaurants' do
     before {user_login}
@@ -60,12 +51,13 @@ feature 'restaurants' do
   end
 
   context 'viewing restaurants' do
-    let!(:kfc){Restaurant.create(name:'KFC')}
+    before {user_login}
+    before {create_restaurant("KFC1")}
+    
     scenario 'lets a user view a restaurant' do
-     visit '/restaurants'
-     click_link 'KFC'
-     expect(page).to have_content 'KFC'
-     expect(current_path).to eq "/restaurants/#{kfc.id}"
+      visit('/restaurants')
+      click_link 'KFC1'
+      expect(find('body')).to have_content 'KFC1'
     end
   end
 
@@ -80,11 +72,15 @@ feature 'restaurants' do
      expect(page).to have_content 'Kentucky Fried Chicken'
      expect(current_path).to eq '/restaurants'
     end
+
+    scenario "Users can only edit restaurants which they've created" do
+
+    end
   end
 
   context 'deleting restaurants' do
     before {user_login}
-    before {Restaurant.create name: 'KFC'}
+    before {create_restaurant('KFC')}
     before {Restaurant.find_by(name: 'KFC').reviews.create(thoughts: "Oh my god")}
 
     scenario 'removes a restaurant when a user clicks a delete link' do
@@ -100,6 +96,39 @@ feature 'restaurants' do
       expect(page).not_to have_content 'KFC'
       expect(page).not_to have_content 'Oh my god'
     end
+
+    scenario "Users can only delete restaurants which they've created" do
+      visit('/')
+      click_link 'Sign out'
+      second_login
+      click_link "Delete KFC"
+      expect(page).to have_content "KFC"
+    end
+  end
+
+  def user_login
+    visit '/restaurants'
+    click_link 'Sign up'
+    fill_in 'Email', with: "tester@test.de"
+    fill_in 'Password', with: "testtest"
+    fill_in 'Password confirmation', with: "testtest"
+    click_button 'Sign up'
+  end
+
+  def second_login
+    visit '/restaurants'
+    click_link 'Sign up'
+    fill_in 'Email', with: "testerTwo@test.de"
+    fill_in 'Password', with: "testtest"
+    fill_in 'Password confirmation', with: "testtest"
+    click_button 'Sign up'
+  end
+
+  def create_restaurant(restaurant_name)
+    visit('/restaurants')
+    click_link 'Add a restaurant'
+    fill_in 'Name', with: restaurant_name
+    click_button 'Create Restaurant'
   end
 
 
