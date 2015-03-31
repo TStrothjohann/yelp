@@ -20,14 +20,31 @@ feature 'restaurants' do
     end
   end
 
+  def user_login
+    visit '/restaurants'
+    click_link 'Sign up'
+    fill_in 'Email', with: "tester@test.de"
+    fill_in 'Password', with: "testtest"
+    fill_in 'Password confirmation', with: "testtest"
+    click_button 'Sign up'
+  end
+
+
   context 'creating restaurants' do
+    before {user_login}
     scenario 'prompts user to fill out a form, then displays the new restaurant' do
-      visit '/restaurants'
       click_link 'Add a restaurant'
       fill_in 'Name', with: 'KFC'
       click_button 'Create Restaurant'
       expect(page).to have_content 'KFC'
       expect(current_path).to eq '/restaurants'
+    end
+
+    scenario "doesn't accept a new restaurant if the user isn't logged in" do
+      visit('/')
+      click_link 'Sign out'
+      click_link 'Add a restaurant'
+      expect(page).to have_content "You need to sign in or sign up before continuing"
     end
 
     context "an invalid restaurant" do
@@ -40,11 +57,9 @@ feature 'restaurants' do
         expect(page).to have_content 'error'
       end
     end
-
   end
 
   context 'viewing restaurants' do
-
     let!(:kfc){Restaurant.create(name:'KFC')}
     scenario 'lets a user view a restaurant' do
      visit '/restaurants'
@@ -55,6 +70,7 @@ feature 'restaurants' do
   end
 
   context 'editing restaurants' do
+    before {user_login}
     before {Restaurant.create name: 'KFC'}
     scenario 'let a user edit a restaurant' do
      visit '/restaurants'
@@ -67,25 +83,24 @@ feature 'restaurants' do
   end
 
   context 'deleting restaurants' do
+    before {user_login}
+    before {Restaurant.create name: 'KFC'}
+    before {Restaurant.find_by(name: 'KFC').reviews.create(thoughts: "Oh my god")}
 
-  before {Restaurant.create name: 'KFC'}
-  before {Restaurant.find_by(name: 'KFC').reviews.create(thoughts: "Oh my god")}
+    scenario 'removes a restaurant when a user clicks a delete link' do
+      visit '/restaurants'
+      click_link 'Delete KFC'
+      expect(page).not_to have_content 'KFC'
+      expect(page).to have_content 'Restaurant deleted successfully'
+    end
 
-  scenario 'removes a restaurant when a user clicks a delete link' do
-    visit '/restaurants'
-    click_link 'Delete KFC'
-    expect(page).not_to have_content 'KFC'
-    expect(page).to have_content 'Restaurant deleted successfully'
+    scenario 'removes all reviews when a user deletes the restaurant' do
+      visit '/restaurants'
+      click_link "Delete KFC"
+      expect(page).not_to have_content 'KFC'
+      expect(page).not_to have_content 'Oh my god'
+    end
   end
-
-  scenario 'removes all reviews when a user deletes the restaurant' do
-    visit '/restaurants'
-    click_link "Delete KFC"
-    expect(page).not_to have_content 'KFC'
-    expect(page).not_to have_content 'Oh my god'
-  end
-
-end
 
 
 end
