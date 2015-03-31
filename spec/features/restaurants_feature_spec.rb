@@ -63,7 +63,8 @@ feature 'restaurants' do
 
   context 'editing restaurants' do
     before {user_login}
-    before {Restaurant.create name: 'KFC'}
+    before {create_restaurant('KFC')}
+    
     scenario 'let a user edit a restaurant' do
      visit '/restaurants'
      click_link 'Edit KFC'
@@ -74,9 +75,14 @@ feature 'restaurants' do
     end
 
     scenario "Users can only edit restaurants which they've created" do
-
+      visit('/')
+      click_link 'Sign out'
+      second_login
+      click_link "Edit KFC"
+      expect(page).to have_content "Only the creator of the restaurant can edit it"
     end
   end
+  
 
   context 'deleting restaurants' do
     before {user_login}
