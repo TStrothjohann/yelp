@@ -26,4 +26,19 @@ feature 'reviewing' do
     expect(page).not_to have_content('wow')
   end
 
+  scenario "Users can delete their own reviews" do
+    leave_review
+    click_link "Delete KFC review"
+    expect(page).to have_content("Review has been deleted")
+  end
+
+  scenario "Users can only delete their own reviews" do
+    leave_review
+    click_link "Sign out"
+    second_login
+    click_link "Delete KFC review"
+    expect(page).to have_content("You can only delete reviews you have created")
+
+  end
+
 end
