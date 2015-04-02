@@ -25,7 +25,6 @@ class RestaurantsController < ApplicationController
   end
 
   def show
-    console
     @restaurant = Restaurant.find(params[:id])
   end
 

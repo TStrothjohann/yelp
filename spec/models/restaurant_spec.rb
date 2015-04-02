@@ -2,9 +2,11 @@ require 'spec_helper'
 
 
 describe Restaurant, :type => :model do
+  let(:restaurant){Restaurant.create name: "kf"}
+  let(:user){User.create id: 3, email: "thomas@test.de", password: "testtest", password_confirmation: "testtest"}
+  let(:review_params){{thoughts: "Wow Great restaurant.", rating: 3}}
 
   it 'is not valid with a name of less than three characters' do
-    restaurant = Restaurant.new(name: "kf")
     expect(restaurant).to have(1).error_on(:name)
     expect(restaurant).not_to be_valid
   end
@@ -13,5 +15,10 @@ describe Restaurant, :type => :model do
     Restaurant.create(name: "Moe's Tavern")
     restaurant = Restaurant.new(name: "Moe's Tavern")
     expect(restaurant).to have(1).error_on(:name)
+  end
+
+  it "can store a related review" do
+    review = restaurant.create_review(user, review_params)
+    expect(review.user_id).to eq(3)
   end
 end

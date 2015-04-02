@@ -85,4 +85,39 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 =end
+
+def user_login
+  visit '/restaurants'
+  click_link 'Sign up'
+  fill_in 'Email', with: "tester@test.de"
+  fill_in 'Password', with: "testtest"
+  fill_in 'Password confirmation', with: "testtest"
+  click_button 'Sign up'
+end
+
+def leave_review
+  user_login
+  create_restaurant("KFC")
+  visit '/restaurants'
+  click_link 'Review KFC'
+  fill_in "Thoughts", with: "no so great"
+  select '2', from: 'Rating'
+  click_button 'Leave Review'
+end
+
+  def second_login
+    visit '/restaurants'
+    click_link 'Sign up'
+    fill_in 'Email', with: "testerTwo@test.de"
+    fill_in 'Password', with: "testtest"
+    fill_in 'Password confirmation', with: "testtest"
+    click_button 'Sign up'
+  end
+
+  def create_restaurant(restaurant_name)
+    visit('/restaurants')
+    click_link 'Add a restaurant'
+    fill_in 'Name', with: restaurant_name
+    click_button 'Create Restaurant'
+  end
 end
