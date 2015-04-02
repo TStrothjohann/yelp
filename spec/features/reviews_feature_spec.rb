@@ -38,7 +38,15 @@ feature 'reviewing' do
     second_login
     click_link "Delete KFC review"
     expect(page).to have_content("You can only delete reviews you have created")
-
   end
+
+  scenario 'displays an average rating for all reviews' do
+    leave_review('So so', '3')
+    click_link('Sign out')
+    leave_second_review('Great', '5')
+    expect(page).to have_content('Average rating: 4')
+  end
+
+
 
 end

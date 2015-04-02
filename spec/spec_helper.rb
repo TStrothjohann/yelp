@@ -86,24 +86,34 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 =end
 
-def user_login
-  visit '/restaurants'
-  click_link 'Sign up'
-  fill_in 'Email', with: "tester@test.de"
-  fill_in 'Password', with: "testtest"
-  fill_in 'Password confirmation', with: "testtest"
-  click_button 'Sign up'
-end
+  def user_login
+    visit '/restaurants'
+    click_link 'Sign up'
+    fill_in 'Email', with: "tester@test.de"
+    fill_in 'Password', with: "testtest"
+    fill_in 'Password confirmation', with: "testtest"
+    click_button 'Sign up'
+  end
 
-def leave_review
-  user_login
-  create_restaurant("KFC")
-  visit '/restaurants'
-  click_link 'Review KFC'
-  fill_in "Thoughts", with: "no so great"
-  select '2', from: 'Rating'
-  click_button 'Leave Review'
-end
+  def leave_review(thoughts="no so great", rating=2)
+    user_login
+    create_restaurant("KFC")
+    visit '/restaurants'
+    click_link 'Review KFC'
+    fill_in "Thoughts", with: thoughts
+    select rating, from: 'Rating'
+    click_button 'Leave Review'
+  end
+
+  def leave_second_review(thoughts="no so great", rating=2)
+    second_login
+    create_restaurant("KFC")
+    visit '/restaurants'
+    click_link 'Review KFC'
+    fill_in "Thoughts", with: thoughts
+    select rating, from: 'Rating'
+    click_button 'Leave Review'
+  end
 
   def second_login
     visit '/restaurants'
