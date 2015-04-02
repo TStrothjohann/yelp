@@ -11,12 +11,7 @@ class Restaurant < ActiveRecord::Base
   end
 
   def average_rating
-    if reviews.any?
-      avrg = 0
-      reviews.each { |review| avrg += review.rating  }
-      avrg / reviews.count
-    else
-      'N/A'
-    end
+    return "N/A" if reviews.none?
+    reviews.average(:rating)
   end
 end
